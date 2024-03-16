@@ -1,12 +1,14 @@
 import { getEmpleados, createEmpleado } from "./empleadosProcesor";
 import React, { useEffect, useState } from 'react';
+import Search from "../search/search";
+import './empleados.css';
 
 const Empleados = () => {
 
     const [empleados, setEmpleados] = useState([]);
     const [copieEmpleados, setCopieEmpleados] = useState([])
-    const [nombre, setNombre] = useState('');
     const [nuevoEmpleado, setNuevoEmpleado] = useState({})
+    const [actualizar, setActualizar] = useState(false)
 
 
     useEffect(() => {
@@ -15,56 +17,48 @@ const Empleados = () => {
             setEmpleados(empl)
             setCopieEmpleados(empl)
         }
-
         getEmp()
+    }, [actualizar]);
 
-        const crearEmpleado = async () => {
-            try {
-                await createEmpleado(nuevoEmpleado);
-            } catch (error) {
-                console.error('Error al crear empleado:', error);
-            }
-        };
-        if (nuevoEmpleado.fecha_ingreso) {
-            crearEmpleado();
-        }
-
-    }, [nuevoEmpleado])
-
-    const handleOnClick = async (event) => {
-        event.preventDefault();
-        try {
-            const searchResult = copieEmpleados.filter(empleado => empleado.nombre.toUpperCase().includes(nombre.toUpperCase()));
-            setEmpleados(searchResult)
-        } catch (error) {
-            console.error('Error al obtener los empleados:', error);
-        }
-    };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         const date = new Date().toISOString();
-        setNuevoEmpleado({
+        const dataEmpleado = {
             ...nuevoEmpleado,
             fecha_ingreso: date
-        });
-    }
+        }
+        try {
+            await createEmpleado(dataEmpleado);
+            setActualizar(!actualizar)
+            setNuevoEmpleado({})
+        } catch (error) {
+            console.error('Error al crear empleado:', error);
+        };
+
+    };
+
+
+    function handleOnChange(event) {
+        setNuevoEmpleado({
+            ...nuevoEmpleado,
+            [event.target.name]: event.target.value
+        })
+    };
 
     return (
         <div>
             <h1>Buscar empleados por nombre</h1>
-            <input
-                type="text"
-                value={nombre}
-                onChange={(event) => setNombre(event.target.value)}
-                placeholder="Ingrese el nombre del empleado"
+            <Search
+                errorMessage={'Error filtrando empleados'}
+                setData={setEmpleados}
+                copieData={copieEmpleados}
             />
-            <button type="submit" onClick={e => handleOnClick(e)}> Buscar </button>
-            <div >
+            <div className="flex">
 
                 {empleados.map(e => {
                     return (
-                        <ul key={e.id}>
+                        <ul key={e.id} className="card">
                             <li>Nombre: {e.nombre}</li>
                             <li>Fecha de ingreso: {e.fecha_ingreso}</li>
                             <li>Salario: {e.salario}</li>
@@ -76,29 +70,27 @@ const Empleados = () => {
 
 
             <div>
-                <h3>Agrega un nuevo empleado</h3>
-                <form onSubmit={handleSubmit}>
+                <h3 style={{ textAlign: 'center' }}>Agrega un nuevo empleado</h3>
+                <form onSubmit={handleSubmit} className='content_form'>
                     <input
+                        className='inputs'
                         type="text"
                         id="nombre"
+                        name="nombre"
                         value={nuevoEmpleado.nombre || ''}
-                        onChange={(event) => setNuevoEmpleado({
-                            ...nuevoEmpleado,
-                            nombre: event.target.value
-                        })}
-                        placeholder="Ingrese el nombre del empleado"
+                        onChange={e => handleOnChange(e)}
+                        placeholder="Nombre del empleado"
                     />
                     <input
+                        className='inputs'
                         type="number"
                         id="salario"
+                        name="salario"
                         value={nuevoEmpleado.salario || ''}
-                        onChange={(event) => setNuevoEmpleado({
-                            ...nuevoEmpleado,
-                            salario: event.target.value
-                        })}
-                        placeholder="Ingrese el salario del empleado"
+                        onChange={e => handleOnChange(e)}
+                        placeholder="Salario del empleado"
                     />
-                    <button type="submit">Crear</button>
+                    <button className='create_solicitud' type="submit">Crear</button>
                 </form>
             </div>
         </div>

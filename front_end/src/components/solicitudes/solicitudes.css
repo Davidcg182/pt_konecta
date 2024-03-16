@@ -1,0 +1,71 @@
+.flex {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.card {
+    border: solid 1px black;
+    border-radius: 10px;
+    width: 30%;
+    height: 100%;
+    margin: 1%;
+}
+
+.detele_button {
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    padding: 10px 10px;
+    cursor: pointer;
+    height: 50px;
+    margin-top: 20px;
+    background-color: crimson;
+    color: white;
+}
+
+
+.content_form {
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+    gap: 15px;
+    color: #545454;
+    width: max-content;
+    justify-content: center;
+    margin: auto;
+}
+
+.inputs {
+    height: 35px;
+    color: #545454;
+    font-size: 15px;
+    border: none;
+    border-bottom: 1px solid rgb(143, 143, 143);
+    display: flex;
+    align-items: flex-end;
+}
+
+
+.select {
+    height: 35px;
+    color: #545454;
+    font-size: 15px;
+    border: none;
+    border-bottom: 1px solid rgb(143, 143, 143);
+    display: flex;
+    align-items: flex-end;
+}
+
+
+.create_solicitud {
+    background-color: green;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    padding: 10px 10px;
+    cursor: pointer;
+}

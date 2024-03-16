@@ -1,0 +1,12 @@
+.content_search {
+    width: 70%;
+    margin: auto;
+}
+
+.content_input_search {
+    background-color: #EFEFEF;
+    border: none;
+    width: 100%;
+    border-radius: 6px;
+    padding: 10px;
+}

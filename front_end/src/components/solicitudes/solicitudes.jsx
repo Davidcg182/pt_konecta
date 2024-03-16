@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { getSolicitudes, createSolicitud, deleteSolicitud } from './solicitudesProcesor.js';
 import { getEmpleados } from '../empleados/empleadosProcesor';
+import Search from '../search/search.jsx';
+import './solicitudes.css'
 
 const Solicitudes = () => {
 
     const [solicitudes, setSolicitudes] = useState([]);
     const [copieSolicitudes, setCopieSolicitudes] = useState([])
-    const [nombre, setNombre] = useState('');
     const [nuevaSolicitud, setNuevaSolicitud] = useState({})
     const [empleados, setEmpleados] = useState([]);
     const [selectedOption, setSelectedOption] = useState('');
-
+    const [actualizar, setActualizar] = useState(false)
 
 
     useEffect(() => {
@@ -24,35 +25,22 @@ const Solicitudes = () => {
 
         getSol()
 
-        const crearSolicitud = async () => {
-            try {
-                await createSolicitud(nuevaSolicitud);
-            } catch (error) {
-                console.error('Error al crear empleado:', error);
-            }
-        };
-        if (nuevaSolicitud.id_empleado) {
-            crearSolicitud();
-        }
-
-    }, [nuevaSolicitud])
-
-    const handleOnClick = async (event) => {
-        event.preventDefault();
-        try {
-            const searchResult = copieSolicitudes.filter(solicitud => solicitud.empleado.nombre.toUpperCase().includes(nombre.toUpperCase()));
-            setSolicitudes(searchResult)
-        } catch (error) {
-            console.error('Error al obtener los empleados:', error);
-        }
-    };
+    }, [actualizar])
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        setNuevaSolicitud({
+        const solicitud = {
             ...nuevaSolicitud,
             id_empleado: selectedOption
-        });
+        };
+
+        try {
+            await createSolicitud(solicitud)
+            setActualizar(!actualizar)
+            setNuevaSolicitud({})
+        } catch (error) {
+            console.error('Error al crear Solicitud:', error);
+        };
     }
 
     const handleSelectChange = (event) => {
@@ -62,72 +50,80 @@ const Solicitudes = () => {
 
     const eliminarSolicitud = async (event) => {
         event.preventDefault();
-        await deleteSolicitud(event.target.value)
+
+        try {
+            await deleteSolicitud(event.target.value)
+            setActualizar(!actualizar)
+        } catch (error) {
+            console.error('Error al eliminar Solicitud:', error);
+        };
     }
+
+    function handleOnChange(event) {
+        setNuevaSolicitud({
+            ...nuevaSolicitud,
+            [event.target.name]: event.target.value
+        })
+    };
 
     return (
         <div>
             <h1>Buscar solicitudes por empleado</h1>
-            <input
-                type="text"
-                value={nombre}
-                onChange={(event) => setNombre(event.target.value)}
-                placeholder="Ingrese el nombre del empleado"
+
+            <Search
+                errorMessage={'Error filtrando solicitudes'}
+                setData={setSolicitudes}
+                copieData={copieSolicitudes}
             />
-            <button type="submit" onClick={e => handleOnClick(e)}> Buscar </button>
+
             <div >
 
                 {solicitudes.map(e => {
                     return (
-                        <div key={e.id}>
-                            <ul>
+                        <div key={e.id} className='flex'>
+                            <ul className='card'>
                                 <li>Resumen: {e.resumen}</li>
                                 <li>Descripcion: {e.descripcion}</li>
                                 <li>Empleado: {e.empleado.nombre}</li>
                                 <li>Codigo: {e.codigo}</li>
                             </ul>
-                            <button value={e.id} onClick={e => eliminarSolicitud(e)}>X</button>
+                            <button className='detele_button' value={e.id} onClick={e => eliminarSolicitud(e)}>X</button>
                         </div>
                     )
                 })}
-
             </div>
 
-
             <div>
-                <h3>Crea una nueva solicitud</h3>
-                <form onSubmit={handleSubmit}>
+                <h3 style={{textAlign: 'center'}}>Crea una nueva solicitud</h3>
+                <form onSubmit={handleSubmit} className='content_form'>
                     <input
+                        className='inputs'
                         type="text"
                         id="descripcion"
+                        name='descripcion'
                         value={nuevaSolicitud.descripcion || ''}
-                        onChange={(event) => setNuevaSolicitud({
-                            ...nuevaSolicitud,
-                            descripcion: event.target.value
-                        })}
+                        onChange={(event) => handleOnChange(event)}
                         placeholder="Ingrese descripcion"
                     />
                     <input
+                        className='inputs'
                         type="text"
                         id="resumen"
+                        name='resumen'
                         value={nuevaSolicitud.resumen || ''}
-                        onChange={(event) => setNuevaSolicitud({
-                            ...nuevaSolicitud,
-                            resumen: event.target.value
-                        })}
+                        onChange={(event) => handleOnChange(event)}
                         placeholder="Ingrese resumen"
                     />
                     <input
+                        className='inputs'
                         type="text"
                         id="codigo"
+                        name='codigo'
                         value={nuevaSolicitud.codigo || ''}
-                        onChange={(event) => setNuevaSolicitud({
-                            ...nuevaSolicitud,
-                            codigo: event.target.value
-                        })}
+                        onChange={(event) => handleOnChange(event)}
                         placeholder="Ingrese codigo"
                     />
-                    <select value={selectedOption} onChange={handleSelectChange}>
+                    <select className='select' value={selectedOption} onChange={handleSelectChange}>
                         <option value="">Selecciona una opción</option>
                         {empleados.map(empleado => {
                             return (
@@ -135,7 +131,7 @@ const Solicitudes = () => {
                             )
                         })}
                     </select>
-                    <button type="submit">Crear</button>
+                    <button className= 'create_solicitud' type="submit">Crear</button>
                 </form>
             </div>
         </div>
